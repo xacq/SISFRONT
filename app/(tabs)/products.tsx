@@ -1,14 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { getProductCategories, getProductsByCategory } from '../services/api';
+import { getProductCategories, getProductsByCategory } from '../../src/services/api';
+import { getProductImageSource } from '../../src/utils/imageUtils';
+import { useRouter } from 'expo-router';
+
+
+interface Product {
+  product_id: number;
+  name: string;
+  description: string;
+  image_url: string;
+
+  // otros campos necesarios...
+}
+
+interface Category {
+  category_id: number;
+  name: string;
+   // otros campos necesarios...
+}
 
 
 const ProductListScreen = () => {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const navigation = useNavigation();
+  const [products, setProducts] = useState<Product[]>([]); // Añadir tipo
+  const [categories, setCategories] = useState<Category[]>([]); // Añadir tipo
+  const router = useRouter(); // <-- USA useRouter
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null); 
 
   useEffect(() => {
     // Cargar categorías y productos iniciales
@@ -30,7 +47,7 @@ const ProductListScreen = () => {
     loadData();
   }, []);
 
-  const handleCategoryChange = async (categoryId) => {
+  const handleCategoryChange = async (categoryId: number) => {
     try {
       setSelectedCategory(categoryId);
       const productsResponse = await getProductsByCategory(categoryId);
@@ -40,14 +57,16 @@ const ProductListScreen = () => {
     }
   };
 
-  const renderProductItem = ({ item }) => (
-    <TouchableOpacity 
+  const renderProductItem = ({ item }: { item: Product }) => ( // <-- Añadir tipo Product aquí
+    <TouchableOpacity
       style={styles.productItem}
-      onPress={() => navigation.navigate('ProductDetail', { productId: item.product_id })}
+      // CAMBIA la navegación para usar router.push con el PATH
+      onPress={() => router.push(`/products/${item.product_id}`)}
     >
-      <Image 
-        source={{ uri: item.image_url || 'https://via.placeholder.com/100' }} 
+      <Image
+        source={getProductImageSource(item.image_url)}
         style={styles.productImage}
+        resizeMode="contain"
       />
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
@@ -57,6 +76,7 @@ const ProductListScreen = () => {
       </View>
     </TouchableOpacity>
   );
+
 
   return (
     <View style={styles.container}>
@@ -70,7 +90,7 @@ const ProductListScreen = () => {
             ]}
             onPress={() => handleCategoryChange(category.category_id)}
           >
-            <Text style={styles.categoryText}>{category.name}</Text>
+            <Text style={styles.categoryText}>{category.name.toUpperCase()}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -107,6 +127,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     color: 'white',
+    fontSize: 12,
   },
   listContainer: {
     padding: 10,

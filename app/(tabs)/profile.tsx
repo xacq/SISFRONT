@@ -2,9 +2,9 @@ import React, { useState , useContext} from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { NavigationProp } from '@react-navigation/native';
-import CustomButton from '../components/CustomButton';
-import { saveUserProfile } from '../services/api';
-import AuthContext from '../components/AuthContext';
+import CustomButton from '../../src/components/CustomButton';
+import { saveUserProfile } from '../../src/services/api';
+import AuthContext from '../../src/context/AuthContext';
 
 type Gender = 'hombre' | 'mujer' | 'otro' | 'prefiero no decir';
 type ActivityLevel = 'sedentario' | 'moderado' | 'activo' | 'muy activo';
@@ -84,6 +84,7 @@ const [userData, setUserData] = useState<UserProfileData>({
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+
       <Text style={styles.label}>Edad:</Text>
       <TextInput
         style={styles.input}
@@ -220,34 +221,34 @@ const [userData, setUserData] = useState<UserProfileData>({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: 10,
     backgroundColor: '#1a1919',
   },
   label: {
     fontSize: 16,
     marginVertical: 8,
-    color: 'white',
+    color: '#F8D930',
   },
   input: {
     borderWidth: 1,
     borderColor: '#F8D930',
-    borderRadius: 8,
+    borderRadius: 5,
     padding: 12,
     marginBottom: 16,
     color:'black',
     backgroundColor: 'lightgray'
   },
   picker: {
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: '#F8D930',
-    borderRadius: 8,
-    marginBottom: 16,
+    borderRadius: 5,
+    marginBottom: 10,
     backgroundColor: 'lightgray'
   },
   smallPicker: {
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: '#F8D930',
-    borderRadius: 8,
+    borderRadius: 5,
     width: 100,
     backgroundColor: 'lightgray'
   },
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   checkboxLabel: {
-    color: 'white',
+    color: '#F8D930',
     flex: 1,
   },
   button: {

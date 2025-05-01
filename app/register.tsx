@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Alert, StyleSheet, Image  } from 'react-native';
-import AuthForm from '../components/AuthForm';
-import CustomButton from '../components/CustomButton';
-import { registerUser } from '../services/api';
+import AuthForm from '../src/components/AuthForm';
+import CustomButton from '../src/components/CustomButton';
+import { registerUser } from '../src/services/api';
 import { NavigationProp } from '@react-navigation/native';
 
 const RegisterScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
@@ -61,7 +61,7 @@ const RegisterScreen = ({ navigation }: { navigation: NavigationProp<any> }) => 
   return (
     <View style={styles.container}>
       <Image 
-          source={require('../../assets/images/login.png')} // Asegúrate de tener esta imagen
+          source={require('../assets/images/login.png')} // Asegúrate de tener esta imagen
           style={styles.logo}
           resizeMode="contain"
         />
