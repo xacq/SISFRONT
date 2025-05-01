@@ -1,9 +1,11 @@
 // app/_layout.tsx
 import React, { useEffect } from 'react';
-import { Stack, useRouter, useSegments, Redirect } from 'expo-router'; // <-- Añade Redirect
+import { Stack, useRouter, useSegments } from 'expo-router'; // Eliminé Redirect ya que no se usa aquí directamente
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
+import { ActivityIndicator, View } from 'react-native'; // Importa para indicador de carga
 
 export default function RootLayout() {
+  // Envuelve toda la navegación con el AuthProvider
   return (
     <AuthProvider>
       <LayoutNav />
@@ -12,56 +14,83 @@ export default function RootLayout() {
 }
 
 function LayoutNav() {
-  const { user } = useAuth();
+  // Obtiene el estado de autenticación y la información de si aún está cargando
+  // (Asume que useAuth puede devolver un estado isLoadingAuth)
+  const { user, isLoadingAuth } = useAuth();
   const segments = useSegments();
   const router = useRouter();
-  const [isTryingToRedirect, setIsTryingToRedirect] = React.useState(true); // Para evitar flicker
 
   useEffect(() => {
-    const inAuthGroup = segments[0] === '(auth)'; // O como definas tu grupo auth
-    const inAppGroup = segments[0] === '(tabs)';
+    console.log('LayoutNav Effect - isLoadingAuth:', isLoadingAuth, 'User:', user, 'Segments:', segments);
 
-    console.log('LayoutNav Effect - User:', user, 'Segments:', segments);
-
-    // Si no hay usuario Y NO estamos explícitamente en login/register (o grupo auth)
-    if (!user && !inAuthGroup && segments[0] !== 'login' && segments[0] !== '_sitemap') {
-         console.log('Redirecting to /login');
-         router.replace('/login');
+    // --- No hacer nada si todavía estamos determinando el estado de autenticación ---
+    if (isLoadingAuth) {
+      console.log('Auth state still loading, skipping redirect logic.');
+      return; // Salir temprano si la autenticación aún no está lista
     }
-    // Si HAY usuario Y estamos en una ruta inicial/auth
-    else if (user && (segments.length === 0 || inAuthGroup || segments[0] === 'login')) {
-         console.log('Redirecting to /(tabs)/');
-         router.replace('/(tabs)/');
+
+    // --- Definir rutas públicas donde un usuario NO logueado PUEDE estar ---
+    //    Asegúrate que los nombres coincidan con los archivos en app/ (ej: 'login', 'register')
+    const publicRoutes = ['login', 'register', '_sitemap', '+not-found']; // Añade otras rutas públicas si existen
+
+    // Obtiene el segmento de ruta actual (o null si estamos en la raíz)
+    const currentSegment = segments[0] || null;
+
+    // --- Lógica de redirección ---
+
+    // CASO 1: Usuario NO logueado
+    if (!user) {
+      // Si NO estamos en una ruta pública permitida...
+      if (currentSegment && !publicRoutes.includes(currentSegment)) {
+        console.log(`Redirecting to /login (User NOT logged in, current segment: ${currentSegment})`);
+        router.replace('/login');
+      } else {
+        // Ya estamos en una ruta pública (login, register) o en la raíz inicial antes del primer render.
+        // No hacemos nada, permitimos que el usuario se quede.
+        console.log(`User NOT logged in, staying on public route: ${currentSegment}`);
+      }
     }
-    // Si ninguna de las condiciones de redirección se cumple (ya estamos donde debemos estar),
-    // indicamos que ya no estamos intentando redirigir activamente.
-    setIsTryingToRedirect(false);
+    // CASO 2: Usuario SÍ logueado
+    else {
+      // Si estamos en la raíz, en login, register, o cualquier otra ruta "pública"
+      // (o un grupo auth si lo tuvieras)...
+      if (!currentSegment || publicRoutes.includes(currentSegment) /* || currentSegment === '(auth)' */) {
+        console.log(`Redirecting to /(tabs)/ (User logged in, current segment: ${currentSegment})`);
+        router.replace('/(tabs)/'); // Redirigir a la pantalla principal de las tabs
+      } else {
+        // Ya estamos dentro de la app (ej: en /tabs/products).
+        // No hacemos nada, permitimos que el usuario navegue libremente.
+         console.log(`User logged in, staying in app route: ${segments.join('/')}`);
+      }
+    }
 
-  }, [user, segments, router]);
+  // Dependencias del useEffect: estado de carga, usuario y segmentos de ruta
+  }, [isLoadingAuth, user, segments, router]);
 
-  // Si no hay segmentos definidos aún, o si todavía estamos en el proceso inicial
-  // de decidir a dónde redirigir basado en el auth, podemos renderizar un Null
-  // o un indicador de carga, o dejar que Stack intente renderizar.
-  // Sin embargo, añadir un Redirect explícito como ruta por defecto puede ser más claro.
+  // --- Renderizado condicional mientras carga el estado de Auth ---
+  if (isLoadingAuth) {
+    // Muestra un indicador de carga básico para evitar mostrar pantallas incorrectas brevemente
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
-
-  // ¡OJO! La lógica del useEffect ya debería manejar las redirecciones.
-  // Renderizar directamente el Stack es lo normal.
-  // Si las redirecciones fallan o son lentas, esta podría ser la causa de errores
-  // al buscar rutas iniciales inexistentes.
-
+  // --- Renderizar el Stack Navigator principal ---
+  // Una vez que sabemos el estado de Auth (cargado) y las redirecciones se han ejecutado (o no),
+  // renderizamos el Stack definido. Expo Router mostrará la pantalla correcta según la URL actual.
   return (
     <Stack screenOptions={{ headerShown: false }}>
-        {/* La definición del Stack debería ser suficiente si el useEffect funciona bien */}
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="login" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="+not-found" />
-
-        {/* Si necesitas forzar un inicio POR DEFECTO si nada más coincide,
-           puedes añadir un Redirect, PERO puede causar bucles si no tienes cuidado.
-           Normalmente, el Stack simplemente no encuentra ruta y muestra +not-found
-           o el useEffect debería redirigir. */}
-         {/* <Stack.Screen name="index" redirect={true} href="/login" /> // ¡USAR CON CUIDADO! */}
-      </Stack>
+      {/* Define las pantallas de nivel superior que el Stack puede manejar */}
+      {/* El grupo (tabs) representa toda la navegación por pestañas */}
+      <Stack.Screen name="(tabs)" />
+      {/* Pantalla de login, accesible directamente */}
+      <Stack.Screen name="login" options={{ presentation: 'modal' }} />
+       {/* Pantalla de registro, necesita existir como app/register.tsx */}
+      <Stack.Screen name="register" options={{ presentation: 'modal' }} />
+      {/* Pantalla por defecto para rutas no encontradas */}
+      <Stack.Screen name="+not-found" />
+    </Stack>
   );
 }

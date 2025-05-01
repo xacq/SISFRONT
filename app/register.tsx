@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { View, Alert, StyleSheet, Image  } from 'react-native';
-import AuthForm from '../src/components/AuthForm';
-import CustomButton from '../src/components/CustomButton';
-import { registerUser } from '../src/services/api';
-import { NavigationProp } from '@react-navigation/native';
+import { View, Alert, StyleSheet, Image } from 'react-native';
+import AuthForm from '../src/components/AuthForm'; // <-- VERIFICA RUTA
+import CustomButton from '../src/components/CustomButton'; // <-- VERIFICA RUTA
+import { registerUser } from '../src/services/api'; // <-- VERIFICA RUTA
 
-const RegisterScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
+import { useRouter } from 'expo-router'; // <-- IMPORTA useRouter
+
+// 2. El componente ya no recibe 'navigation'
+const RegisterScreen = () => {
+  const router = useRouter(); // <-- USA useRouter
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,85 +19,104 @@ const RegisterScreen = ({ navigation }: { navigation: NavigationProp<any> }) => 
   };
 
   const handleRegister = async () => {
+    // Validaciones (están bien)
+    if (!username || !email || !password) {
+      Alert.alert('Error', 'Todos los campos son obligatorios');
+      return;
+    }
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Por favor ingresa un email válido');
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
     try {
-      if (!username || !email || !password) {
-        Alert.alert('Error', 'Todos los campos son obligatorios');
-        return;
-      }
-
-      // Validación de formato de email
-      if (!validateEmail(email)) {
-        Alert.alert('Error', 'Por favor ingresa un email válido');
-        return;
-      }
-
-      // Validación de contraseña (ejemplo mínimo 6 caracteres)
-      if (password.length < 6) {
-        Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
-        return;
-      }
-
-      const response = await registerUser({
-        username,
-        email,
-        password
-      });
+      // Llama a la API
+      const response = await registerUser({ username, email, password }); // Asume que devuelve { success: boolean, message?: string }
 
       if (response.success) {
-        Alert.alert('Éxito', response.message || 'Registro exitoso', [
-          { text: 'OK', onPress: () => navigation.navigate('Login') }
-        ]);
-      }
-    } catch (error) {
-      const errorResponse = (error as any).response;
-      const errorMessage = errorResponse?.data?.message || 'Error en el registro';
-
-      // Manejo específico para correo existente
-      if (errorResponse?.status === 409) {
-        Alert.alert('Error', errorMessage);
+        // Éxito en el registro
+        Alert.alert(
+          'Éxito',
+          response.message || '¡Registro exitoso!',
+          [
+            {
+              text: 'Ir a Inicio de Sesión',
+              // 3. CAMBIA navigation.navigate a router.push/replace
+              onPress: () => router.replace('/login') // Usa replace para no añadir Register al historial
+            }
+          ]
+        );
       } else {
-        Alert.alert('Error', errorMessage);
+         // Caso donde el API devuelve { success: false, message: '...' }
+         // (Asegúrate que tu API devuelva esto o lanza un error específico)
+         Alert.alert('Error de Registro', response.message || 'No se pudo completar el registro.');
       }
+
+    } catch (error: any) {
+      console.error('Registration failed:', error);
+      const errorResponse = error.response;
+      let errorMessage = 'Ocurrió un error inesperado durante el registro.';
+
+      if (errorResponse) {
+        if (errorResponse.status === 409) { // Conflicto (ej: email ya existe)
+          errorMessage = errorResponse.data?.message || 'El correo electrónico o nombre de usuario ya están en uso.';
+        } else if (errorResponse.data?.message) {
+          errorMessage = errorResponse.data.message;
+        }
+      } else if (error.request) {
+        errorMessage = 'No se pudo conectar con el servidor.';
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+      Alert.alert('Error de Registro', errorMessage);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Image 
-          source={require('../assets/images/login.png')} // Asegúrate de tener esta imagen
+      <Image
+          source={require('../assets/images/login.png')} // <-- VERIFICA RUTA
           style={styles.logo}
           resizeMode="contain"
         />
       <AuthForm
         fields={[
-          { label: 'Nombre de usuario', value: username, onChangeText: setUsername, autoCapitalize: 'words' },
-          { label: 'Email', value: email, onChangeText: setEmail,  keyboardType: 'email-address'},
+          { label: 'Nombre de usuario', value: username, onChangeText: setUsername, autoCapitalize: 'none' }, // autoCapitalize none para username suele ser mejor
+          { label: 'Email', value: email, onChangeText: setEmail, keyboardType: 'email-address', autoCapitalize: 'none' },
           { label: 'Contraseña', value: password, onChangeText: setPassword, secure: true, autoCapitalize: 'none' }
         ]}
       />
-      <CustomButton 
-        title="GUARDAR" 
+      <CustomButton
+        title="GUARDAR REGISTRO" // Más específico
         iconColor='#1a1919'
         iconName='save-outline'
         iconPosition='right'
         iconSize={24}
-        onPress={handleRegister} 
+        onPress={handleRegister}
         style={styles.button}/>
       <CustomButton
-        title="TENGO UNA CUENTA"
+        title="YA TENGO CUENTA (LOGIN)" // Más claro
         iconColor='#1a1919'
-        iconName='person-outline'  
+        iconName='log-in-outline'
         iconPosition='right'
         iconSize={24}
-        onPress={() => navigation.navigate('Login')}
+        // 4. CAMBIA navigation.navigate a router.push (o goBack si prefieres)
+        onPress={() => router.push('/login')} // push añade login al historial
+        // Alternativa: si quieres que actúe como el botón 'atrás':
+        // onPress={() => router.back()}
         style={styles.button}
       />
     </View>
   );
 };
 
+// ... (estilos igual)
 const styles = StyleSheet.create({
-  container: {
+    container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -103,12 +125,15 @@ const styles = StyleSheet.create({
   },
   logo: {
     height: 110,
-    marginTop: -50,
+    marginTop: -50, // Ajusta
+    marginBottom: 30, // Espacio
   },
   button: {
     width: '80%',
     backgroundColor: '#F8D930',
+    marginTop: 15, // Espaciado entre botones y form
   },
 });
+
 
 export default RegisterScreen;
