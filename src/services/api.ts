@@ -75,13 +75,7 @@ export const addConsumption = async (userId: number, productId: number, quantity
 
 export const saveUserProfile = async (userId: number, profileData: UserProfileData) => {
   try {
-    // Convertir dietary_restrictions a string separado por comas
-    const dataToSend = {
-      ...profileData,
-      dietary_restrictions: profileData.dietary_restrictions.join(',')
-    };
-    
-    const response = await api.post(`/users/${userId}/profile`, dataToSend);
+    const response = await api.post(`/users/${userId}/profile`, profileData);
     return response.data;
   } catch (error) {
     console.error('Error saving profile:', error);

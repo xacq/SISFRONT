@@ -17,7 +17,7 @@ export interface UserProfileData {
   primary_goal: PrimaryGoal;
   sweat_level: SweatLevel;
   caffeine_tolerance: CaffeineTolerance;
-  dietary_restrictions: DietaryRestriction[];
+  dietary_restrictions: DietaryRestriction;
 }
 
 export interface UserData {

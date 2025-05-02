@@ -48,10 +48,9 @@ const PersonalDataForm = () => {
     dietary_restrictions: 'no' // <-- VALOR INICIAL STRING
   });
 
-  // 3. ELIMINA handleDietaryChange (ya no es necesario para selección única)
-
+  // --- REEMPLAZA tu función handleSubmit actual con ESTA ---
   const handleSubmit = async () => {
-    // Validación y conversión de numéricos
+    // Validación y conversión de numéricos (ESTO ESTABA BIEN)
     const ageNum = parseInt(String(userData.age), 10);
     const weightNum = parseFloat(String(userData.weight));
     const heightNum = parseFloat(String(userData.height));
@@ -61,7 +60,6 @@ const PersonalDataForm = () => {
         return;
     }
 
-    // Crear objeto de datos a enviar (con números)
     const profileDataToSend = {
         ...userData,
         age: ageNum,
@@ -69,23 +67,44 @@ const PersonalDataForm = () => {
         height: heightNum,
     };
 
+    console.log('[PROFILE.TSX] handleSubmit triggered.');
+    console.log('[PROFILE.TSX] Current user object from context:', JSON.stringify(user, null, 2));
+
+    // --- ¡¡CAMBIO CRUCIAL AQUÍ!! ---
+    // Extrae el ID del objeto anidado user.user
+    // Usa optional chaining (?.) por si acaso user o user.user fueran nulos/undefined
+    const userId = user?.user?.id;
+
+    // Log del ID EXTRAÍDO
+    console.log('[PROFILE.TSX] Extracted userId to be passed:', userId, '(Type:', typeof userId, ')');
+    // --- FIN CAMBIO CRUCIAL ---
 
     try {
-      if (!user) {
-        Alert.alert('Error', 'Usuario no encontrado.');
-        return;
+      // --- ¡¡CAMBIO CRUCIAL EN LA VALIDACIÓN!! ---
+      // Valida la variable 'userId' que acabamos de extraer
+      if (!userId || typeof userId !== 'number') { // Verifica si existe Y si es un número
+        // Este es el error que estabas viendo "Usuario inválido..."
+        Alert.alert('Error', 'ID de usuario inválido o no encontrado en el contexto. Intenta iniciar sesión de nuevo.');
+        return; // Detiene si el ID no es válido
       }
-      // 4. Llama a saveUserProfile con los datos formateados
-      await saveUserProfile(user.id, profileDataToSend);
+      // --- FIN CAMBIO VALIDACIÓN ---
+
+      // --- ¡¡CAMBIO CRUCIAL EN LA LLAMADA A API!! ---
+      // Llama a saveUserProfile con la variable 'userId' validada
+      await saveUserProfile(userId, profileDataToSend);
+      // --- FIN CAMBIO LLAMADA ---
+
       Alert.alert('Éxito', 'Perfil guardado correctamente', [
-         { text: 'OK', onPress: () => router.back() } // Vuelve atrás
+         { text: 'OK', onPress: () => router.back() }
       ]);
-    } catch (error: any) { // Mejor manejo de errores
+    } catch (error: any) {
         console.error('Error saving profile:', error);
         const errorMsg = error?.response?.data?.message || error?.message || 'No se pudo guardar el perfil.';
         Alert.alert('Error', errorMsg);
     }
   };
+
+
 
   // Función para manejar cambio en TextInput numéricos
    const handleNumericChange = (field: keyof UserProfileData, text: string) => {

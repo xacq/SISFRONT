@@ -59,25 +59,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#F8D930', // Color de acento
     textAlign: 'center',
-    lineHeight: 40, // Espaciado entre líneas para mejor lectura
-    paddingHorizontal: 20, // Espacio lateral para evitar que el texto toque los bordes
-    textTransform: 'uppercase', // Texto en mayúsculas para mayor impacto
-    letterSpacing: 1, // Espaciado entre letras para mayor claridad
-    textShadowColor: '#000', // Sombra para destacar el texto
-    textShadowOffset: { width: 1, height: 1 }, // Desplazamiento de la sombra
-    textShadowRadius: 5, // Difuminado de la sombra
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semitransparente para destacar el texto
+    marginBottom: 20, // Espacio entre el título y la descripción
     borderRadius: 10, // Bordes redondeados para un look moderno
     padding: 10, // Espacio interno para el texto
-    overflow: 'hidden', // Para que el fondo no sobresalga
-    maxWidth: '90%', // Limitar el ancho máximo para pantallas grandes
+
   },
   description: {
     fontSize: 18,
     color: 'lightgray', // Texto legible sobre fondo oscuro
     textAlign: 'center',
     lineHeight: 24, // Espaciado entre líneas para mejor lectura
-    marginBottom: 20, // Espacio entre párrafos
+    marginBottom: 10, // Espacio entre párrafos
   },
   highlight: {
     color: '#F8D930', // Resaltar palabras clave
