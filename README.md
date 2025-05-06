@@ -18,7 +18,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 
 
-#Instalaciones a realizar dentro de REAC NATIVE
+# Instalaciones a realizar dentro de REAC NATIVE
 
 npm install @react-navigation/native @react-navigation/stack react-native-gesture-handler react-native-reanimated axios
 
@@ -29,3 +29,9 @@ npm install @react-native-picker/picker
 
 npm i --save-dev @types/react-native-snap-carousel
 
+
+# En el caso de tener problemas con la version SDK 52 - 53
+
+  expo upgrade
+
+  npm install --legacy-peer-deps

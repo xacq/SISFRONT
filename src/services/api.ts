@@ -2,7 +2,7 @@ import axios from 'axios';
 import { UserData , UserProfileData } from '../types/UserTypes';
 
 const api = axios.create({
-  baseURL: 'http://192.168.3.80:5000/api',
+  baseURL: 'http://192.168.0.103:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
