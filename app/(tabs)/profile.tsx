@@ -73,7 +73,7 @@ const PersonalDataForm = () => {
     // --- ¡¡CAMBIO CRUCIAL AQUÍ!! ---
     // Extrae el ID del objeto anidado user.user
     // Usa optional chaining (?.) por si acaso user o user.user fueran nulos/undefined
-    const userId = user?.user?.id;
+    const userId = user?.id;
 
     // Log del ID EXTRAÍDO
     console.log('[PROFILE.TSX] Extracted userId to be passed:', userId, '(Type:', typeof userId, ')');

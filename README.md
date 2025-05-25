@@ -35,3 +35,7 @@ npm i --save-dev @types/react-native-snap-carousel
   expo upgrade
 
   npm install --legacy-peer-deps
+
+  npx expo install @expo/vector-icons
+
+   
