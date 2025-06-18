@@ -38,4 +38,6 @@ npm i --save-dev @types/react-native-snap-carousel
 
   npx expo install @expo/vector-icons
 
-   
+   npm install @react-native-async-storage/async-storage
+
+   npm install --save-dev @types/react-native__async-storage__async-storage
