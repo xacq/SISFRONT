@@ -16,6 +16,8 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
     npx expo start
    ```
 
+user demo
+
 
 
 # Instalaciones a realizar dentro de REAC NATIVE
@@ -41,3 +43,10 @@ npm i --save-dev @types/react-native-snap-carousel
    npm install @react-native-async-storage/async-storage
 
    npm install --save-dev @types/react-native__async-storage__async-storage
+
+
+   Ultima actualizacion
+
+   ejecutar 
+   
+   npm install expo@53.0.11 expo-blur@~14.1.5 expo-constants@~17.1.6 expo-linking@~7.1.5 expo-router@~5.1.0 expo-splash-screen@~0.30.9 expo-symbols@~0.4.5 expo-system-ui@~5.0.8 react-native@0.79.3 react-native-screens@~4.11.1 jest-expo@~53.0.7 --legacy-peer-deps
