@@ -36,7 +36,7 @@ const ProductListScreen = () => {
         
         if (categoriesResponse.length > 0) {
           setSelectedCategory(categoriesResponse[0].category_id);
-          const productsResponse = await getProductsByCategory(categoriesResponse[0].category_id);
+          const productsResponse = await getProductsByCategory(categoriesResponse[0].category_id.toString());
           setProducts(productsResponse);
         }
       } catch (error) {
@@ -50,7 +50,7 @@ const ProductListScreen = () => {
   const handleCategoryChange = async (categoryId: number) => {
     try {
       setSelectedCategory(categoryId);
-      const productsResponse = await getProductsByCategory(categoryId);
+      const productsResponse = await getProductsByCategory(categoryId.toString());
       setProducts(productsResponse);
     } catch (error) {
       console.error('Error loading products:', error);

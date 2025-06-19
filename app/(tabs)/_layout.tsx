@@ -47,12 +47,11 @@ export default function TabLayout() {
 
       {/* --- NUEVA PANTALLA DE RECOMENDACIONES --- */}
       <Tabs.Screen
-        name="recommendations" // DEBE COINCIDIR con el nombre del archivo: app/(tabs)/recommendations.tsx
+        name="recommendations"
         options={{
-          title: 'Sugerencias',
-          tabBarIcon: ({ color, focused }) => <TabBarIconMCI name={focused ? "brain" : "brain-outline"} color={color} focused={focused} />,
-          // headerTitle: 'Tus Recomendaciones', // Título para la cabecera de esta pantalla si headerShown es true
-          headerShown: false, // Decide si quieres cabecera para esta pantalla específica
+          title: 'Recomendaciones',
+          tabBarIcon: ({ color }) =>
+            <MaterialCommunityIcons name="brain" color={color} size={28} />
         }}
       />
       {/* --- FIN NUEVA PANTALLA --- */}

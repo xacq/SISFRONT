@@ -10,7 +10,7 @@ import api from '../../src/services/api';
 
 // ... (definiciones de API_BASE_URL, API_BASE_URL_IMAGES, Product, RecommendationItem como antes)
 // Definición de la IP de tu backend
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5000'; // O tu IP por defecto
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.103:5000'; // O tu IP por defecto
 const API_BASE_URL_IMAGES = `${API_BASE_URL}`;
 
 interface Product {
