@@ -29,8 +29,9 @@ const LoginScreen = () => {
       // ----------------------------------------------------------
       // 3. MANEJO DE ÉXITO: Llama a la función del AuthContext
       // ----------------------------------------------------------
-      console.log('Login successful, calling context login:', userData); // Log para depurar
-      login(userData.token, userData.user); // ✅ Correcto
+      console.log('Login successful, calling context login:', userData);
+      const { token, user } = userData;
+      login(token, user);
       // NO NAVEGUES DESDE AQUÍ. El _layout.tsx se encargará de redirigir
       // al detectar el cambio en el 'user' del contexto.
       // ----------------------------------------------------------

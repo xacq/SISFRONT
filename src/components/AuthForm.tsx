@@ -25,7 +25,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ fields }) => {
             value={field.value}
             onChangeText={field.onChangeText}
             secureTextEntry={field.secure || false}
-            autoCapitalize="none"
+            autoCapitalize={field.autoCapitalize || 'none'}
           />
         </View>
       ))}
